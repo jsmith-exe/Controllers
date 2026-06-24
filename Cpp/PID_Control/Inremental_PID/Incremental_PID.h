@@ -3,43 +3,44 @@
 #include <utility>
 #include <math.h>
 
-class PIDVelocity {
+class INCREMENT_PID 
+{
 public:
-  PIDVelocity(float Kp, float Ki, float Kd,
-              float integral_reset,
-              float out_min, float out_max,
-              float d_tau);
+    INCREMENT_PID(float Kp, float Ki, float Kd, float integral_reset, float out_min, float out_max);
+    void begin();
+    void reset();
+    void calcDt(); 
+    void checkIntegralReset();
+    void calculateOutput();
+    void calculateDeltaOutput();
+    float getControlOutput(float setpoint, float measurement);
 
-  // Returns {delta_output, latency_ms}
-  std::pair<float, float> update(float setpoint, float measurement);
+    float latency_ms;
 
-  void reset();
-  void setGains(float Kp, float Ki, float Kd);
-  void setDerivativeFilterTau(float tau_sec);
-
-  // Optional helpers for bumpless transfer / debugging
-  void setOutputState(float u);
-  float getOutputState() const;
+    float output;
+    float prev_output;
+    float delta_ouput;
 
 private:
-  static float clampf(float x, float lo, float hi);
+  float clampValue(float value, float min_clamp, float max_clamp);
 
-  float Kp_, Ki_, Kd_;
+  float prev_meas;
+  float last_time_us;
 
-  float integral_;
-  float prev_meas_;
-  float dMeas_filt_;
-  uint32_t last_us_;
+  float error = 0.0;
+  float prev_error = 0.0;
+  float prev_prev_error = 0.0;
+  bool PREV_PREV_ERROR_FLAG = false;
 
-  float integral_reset_;
-  float out_min_, out_max_;
-  float d_tau_;
+  float prev_output = 0.0;
 
-  // Previous term values for incremental output
-  float prev_P_;
-  float prev_I_;
-  float prev_D_;
+  float tic_us = 0.0;
+  float current_time_us = 0.0;
+  float toc_us = 0.0;
+  float last_time_us = 0.0;
 
-  // Internal output state to support saturation/anti-windup
-  float output_state_;
+  float integral_reset;
+  float out_min, out_max;
+
+  float dt;
 };
