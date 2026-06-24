@@ -1,35 +1,23 @@
 #include "Incremental_PID.h"
 
-INCREMENT_PID::INCREMENT_PID(float Kp, float Ki, float Kd, float integral_reset, float out_min, float out_max)
+INCREMENT_PID::INCREMENT_PID(float Kp_, float Ki_, float Kd_, float out_min_, float out_max_)
   : Kp(Kp), Ki(Ki), Kd(Kd),
-    integral(0.0f),
-    prev_meas(0.0f),
-    last_us(micros()),
     integral_reset(integral_reset),
-    out_min(out_min), out_max(out_max),
+    out_min(out_min), out_max(out_max)
 {
 }
 
 void INCREMENT_PID::begin()
 {
+  last_time_us = micros();
 }
 
-float INCREMENT_PID::clampValue(float value, float min_clamp, float max_clamp) 
+float INCREMENT_PID::clampValue(float value) 
 {
-  if (value < min_clamp) return min_clamp;
-  if (value > max_clamp) return max_clamp;
+  if (value < out_min) return out_min;
+  if (value > out_max) return out_max;
 
   return value;
-}
-
-void INCREMENT_PID::reset() 
-{
-  integral = 0.0f;
-  prev_meas = 0.0f;
-  prev_P = 0.0f;
-  prev_I = 0.0f;
-  prev_D = 0.0f;
-  last_us = micros();
 }
 
 void INCREMENT_PID::calcDt()
@@ -45,21 +33,13 @@ void INCREMENT_PID::calcDt()
     const float toc_us = micros();
     latency_ms = (float)((uint32_t)(toc_us - tic_us)) * 1e-3f;
     last_time_us = current_time_us;
-    prev_meas = measurement;
   } 
-}
-
-void INCREMENT_PID::checkIntegralReset()
-{
-  if (integral_reset >= 0.0f && fabsf(error) <= integral_reset) {
-    integral = 0.0f;
-  }
 }
 
 void INCREMENT_PID::calculateOutput()
 {
   float output_calc = prev_output + delta_ouput;
-  output = clampValue(output_calc, out_min, out_max);
+  output = clampValue(output_calc);
 }
 
 void INCREMENT_PID::calculateDeltaOutput()
