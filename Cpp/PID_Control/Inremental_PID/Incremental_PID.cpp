@@ -1,9 +1,8 @@
 #include "Incremental_PID.h"
 
 INCREMENT_PID::INCREMENT_PID(float Kp_, float Ki_, float Kd_, float out_min_, float out_max_)
-  : Kp(Kp), Ki(Ki), Kd(Kd),
-    integral_reset(integral_reset),
-    out_min(out_min), out_max(out_max)
+  : Kp(Kp_), Ki(Ki_), Kd(Kd_),
+    out_min(out_min_), out_max(out_max_)
 {
 }
 

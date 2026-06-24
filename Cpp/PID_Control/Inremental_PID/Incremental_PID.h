@@ -22,22 +22,21 @@ public:
     float Kp;
     float Ki;
     float Kd;
-    float integral_reset;
     int out_min;
     int out_max;
 
 private:
   float clampValue(float value);
 
-  float error = 0.0;
-  float prev_error = 0.0;
-  float prev_prev_error = 0.0;
+  float error;
+  float prev_error ;
+  float prev_prev_error;
   bool PREV_PREV_ERROR_FLAG = false;
 
-  float tic_us = 0.0;
-  float current_time_us = 0.0;
-  float toc_us = 0.0;
-  float last_time_us = 0.0;
+  float tic_us;
+  float current_time_us;
+  float toc_us;
+  float last_time_us;
 
   float dt;
 };
