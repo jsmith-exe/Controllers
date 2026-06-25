@@ -18,6 +18,17 @@ void INCREMENT_PID::setTunings(float Kp_, float Ki_, float Kd_)
   Kd = Kd_;
 }
 
+void INCREMENT_PID::resetOutput(float value)
+{
+  output = value;
+  prev_output = value;
+  delta_ouput = 0.0f;
+
+  error = 0.0f;
+  prev_error = 0.0f;
+  prev_prev_error = 0.0f;
+}
+
 float INCREMENT_PID::clampValue(float value) 
 {
   if (value < out_min) return out_min;
@@ -59,20 +70,18 @@ void INCREMENT_PID::calculateDeltaOutput()
 float INCREMENT_PID::getControlOutput(float setpoint, float measurement) 
 {
   calcDt();
+
   error = setpoint - measurement;
+
   calculateDeltaOutput();
-
-  prev_error = error;
-  if (PREV_PREV_ERROR_FLAG)
-  {
-    prev_prev_error = prev_error;
-  }
-  PREV_PREV_ERROR_FLAG = true;
-
   calculateOutput();
+
+  prev_prev_error = prev_error;
+  prev_error = error;
   prev_output = output;
 
   last_time_us = current_time_us;
+
   toc_us = micros();
   latency_ms = (toc_us - tic_us) * 1e-3f;
 

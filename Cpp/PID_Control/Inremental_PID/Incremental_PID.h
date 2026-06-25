@@ -9,6 +9,7 @@ public:
     INCREMENT_PID(float Kp_, float Ki_, float Kd_, float out_min_, float out_max_);
     void begin();
     void setTunings(float Kp_, float Ki_, float Kd_);
+    void resetOutput(float value);
     void calcDt(); 
     void calculateOutput();
     void calculateDeltaOutput();
