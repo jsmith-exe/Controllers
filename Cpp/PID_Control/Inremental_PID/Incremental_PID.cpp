@@ -11,6 +11,13 @@ void INCREMENT_PID::begin()
   last_time_us = micros();
 }
 
+void INCREMENT_PID::setTunings(float Kp_, float Ki_, float Kd_)
+{
+  Kp = Kp_;
+  Ki = Ki_;
+  Kd = Kd_;
+}
+
 float INCREMENT_PID::clampValue(float value) 
 {
   if (value < out_min) return out_min;

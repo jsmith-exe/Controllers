@@ -8,6 +8,7 @@ class INCREMENT_PID
 public:
     INCREMENT_PID(float Kp_, float Ki_, float Kd_, float out_min_, float out_max_);
     void begin();
+    void setTunings(float Kp_, float Ki_, float Kd_);
     void calcDt(); 
     void calculateOutput();
     void calculateDeltaOutput();
