@@ -19,7 +19,7 @@ public:
 
     float output;
     float prev_output;
-    float delta_ouput;
+    float delta_output;
 
     float Kp;
     float Ki;
@@ -28,7 +28,7 @@ public:
     int out_max;
 
 private:
-  float clampValue(float value);
+  float saturation(float value);
 
   float error;
   float prev_error ;

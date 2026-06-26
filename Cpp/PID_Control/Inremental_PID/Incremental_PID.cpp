@@ -22,14 +22,14 @@ void INCREMENT_PID::resetOutput(float value)
 {
   output = value;
   prev_output = value;
-  delta_ouput = 0.0f;
+  delta_output = 0.0f;
 
   error = 0.0f;
   prev_error = 0.0f;
   prev_prev_error = 0.0f;
 }
 
-float INCREMENT_PID::clampValue(float value) 
+float INCREMENT_PID::saturation(float value) 
 {
   if (value < out_min) return out_min;
   if (value > out_max) return out_max;
@@ -43,33 +43,45 @@ void INCREMENT_PID::calcDt()
   current_time_us = micros();
   const float dt_us = (current_time_us - last_time_us);
   dt = (float)dt_us * 1e-6f;
-
-  // Protect against zero / tiny dt
-  if (dt <= 1e-9f) 
-  {
-    const float toc_us = micros();
-    latency_ms = (float)((uint32_t)(toc_us - tic_us)) * 1e-3f;
-    last_time_us = current_time_us;
-  } 
 }
 
 void INCREMENT_PID::calculateOutput()
 {
-  float output_calc = prev_output + delta_ouput;
-  output = clampValue(output_calc);
+  float pre_sat_output = prev_output + delta_output;
+  output = saturation(pre_sat_output);
 }
 
 void INCREMENT_PID::calculateDeltaOutput()
 {
-  const float P = Kp * (error - prev_error);
-  const float I = Ki * error * dt;
-  const float D = Kd * ( ( error - (2*prev_error) + prev_prev_error ) / (dt) );
-  delta_ouput = P + I + D;
+  float P = Kp * (error - prev_error);
+  float I = Ki * error * dt;
+  float D = Kd * ( ( error - (2.0f*prev_error) + prev_prev_error ) / (dt) );
+
+  float pre_sat_delta_output = P + I + D;
+
+  float pre_sat_predicted_output = prev_output + pre_sat_delta_output;
+  float sat_predicted_output = saturation(pre_sat_predicted_output);
+
+  bool pushing_high = (pre_sat_predicted_output > out_max) && (I > 0.0f);
+  bool pushing_low  = (pre_sat_predicted_output < out_min) && (I < 0.0f);
+
+  if (pushing_high || pushing_low)
+  {
+    delta_output = P + D;
+  } else
+  {
+    delta_output = P + I + D;
+  }
 }
 
 float INCREMENT_PID::getControlOutput(float setpoint, float measurement) 
 {
   calcDt();
+
+  if (dt <= 1e-9f)
+  {
+    return output;
+  }
 
   error = setpoint - measurement;
 
