@@ -96,6 +96,7 @@ float INCREMENT_PID::getControlOutput(float setpoint, float measurement)
 
   toc_us = micros();
   latency_ms = (toc_us - tic_us) * 1e-3f;
+  loop_frequency = 1 / (latency_ms * 1e-3f);
 
   return output;
 }

@@ -16,6 +16,7 @@ public:
     float getControlOutput(float setpoint, float measurement);
 
     float latency_ms;
+    float loop_frequency;
 
     float output;
     float prev_output;
